@@ -1,0 +1,86 @@
+CREATE TABLE locales (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  code VARCHAR(10) NOT NULL UNIQUE,
+  name VARCHAR(100) NOT NULL,
+  is_active TINYINT(1) NOT NULL DEFAULT 1,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE translations (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  namespace VARCHAR(64) NOT NULL,
+  t_key VARCHAR(255) NOT NULL,
+  locale_code VARCHAR(10) NOT NULL,
+  t_value TEXT NOT NULL,
+  updated_by BIGINT NULL,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_trans (namespace, t_key, locale_code)
+);
+
+CREATE TABLE users (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  display_name VARCHAR(100) NULL,
+  avatar_key VARCHAR(255) NULL,
+  locale_pref VARCHAR(10) NULL,
+  role ENUM('user','admin') NOT NULL DEFAULT 'user',
+  is_active TINYINT(1) NOT NULL DEFAULT 1,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE refresh_tokens (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  user_id BIGINT NOT NULL,
+  token_hash CHAR(64) NOT NULL,
+  user_agent VARCHAR(255) NULL,
+  ip_address VARCHAR(64) NULL,
+  expires_at DATETIME NOT NULL,
+  revoked_at DATETIME NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_user_exp (user_id, expires_at)
+);
+
+CREATE TABLE password_resets (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  user_id BIGINT NOT NULL,
+  token_hash CHAR(64) NOT NULL,
+  expires_at DATETIME NOT NULL,
+  used_at DATETIME NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_user_token (user_id, token_hash)
+);
+
+CREATE TABLE files (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  owner_id BIGINT NOT NULL,
+  s3_key VARCHAR(255) NOT NULL,
+  mime_type VARCHAR(128) NOT NULL,
+  size_bytes BIGINT NOT NULL,
+  is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_owner (owner_id, is_deleted)
+);
+
+CREATE TABLE audit_logs (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  actor_id BIGINT NULL,
+  action VARCHAR(64) NOT NULL,
+  target_type VARCHAR(64) NULL,
+  target_id BIGINT NULL,
+  ip_address VARCHAR(64) NULL,
+  user_agent VARCHAR(255) NULL,
+  payload_json JSON NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_action_time (action, created_at)
+);
+
+CREATE TABLE feature_flags (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  flag_key VARCHAR(100) NOT NULL UNIQUE,
+  is_enabled TINYINT(1) NOT NULL DEFAULT 0,
+  description VARCHAR(255) NULL,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);

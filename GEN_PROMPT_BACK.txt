@@ -1,0 +1,29 @@
+BEGIN OUTPUT INSTRUCTIONS
+
+You are generating the ENTIRE backend codebase for BacKRoom-back.
+
+# Must-Haves
+- Node.js 20 + TypeScript + Express
+- Folders: src/config, src/common, src/modules/{auth,users,files,i18n,admin}, src/db, src/docs
+- MySQL with mysql2/promise; env-driven configuration
+- Auth with JWT access (<=15m) + refresh (httpOnly cookie, 7–30d); rotation + reuse detection
+- Forgot/Reset password via SMTP; Mailpit in dev
+- Files: S3 presigned PUT/GET; confirm metadata; enforce owner checks
+- i18n: fetch by `locale` & `namespace` from DB; in-memory cache + ETag
+- Admin: users (role/disable), translations, flags, audit logs
+- Validation: Zod/Joi; Helmet; CORS allowlist from `FRONTEND_ORIGIN`
+- Rate limiting; structured logs; `/api/health`, `/api/ready`
+- OpenAPI at `/docs` (dev only)
+- Dockerfile (multi-stage) and docker-compose.yml (already provided here) must work
+
+# Contract with Frontend
+- All API paths are under `/api`
+- CORS must allow origin from `FRONTEND_ORIGIN`
+- Set secure cookie flags appropriately (dev vs prod) for refresh token
+
+# Provide
+- Complete source files with real implementations (no placeholders)
+- Scripts in package.json for dev/build/start
+- README snippet: how to run locally and in Docker
+
+END OUTPUT INSTRUCTIONS

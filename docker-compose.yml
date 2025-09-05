@@ -1,0 +1,76 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: appdb
+      MYSQL_USER: app
+      MYSQL_PASSWORD: app_pw
+      MYSQL_ROOT_PASSWORD: root_pw
+    ports: ["3306:3306"]
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  flyway:
+    image: flyway/flyway:10
+    depends_on:
+      mysql:
+        condition: service_healthy
+    command: -url=jdbc:mysql://mysql:3306/appdb -user=app -password=app_pw -connectRetries=60 migrate
+    volumes:
+      - ./flyway/sql:/flyway/sql
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports: ["9000:9000", "9001:9001"]
+    volumes:
+      - minio_data:/data
+
+  create-bucket:
+    image: minio/mc:latest
+    depends_on: [minio]
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 minioadmin minioadmin &&
+      mc mb -p local/app-bucket || true &&
+      mc anonymous set download local/app-bucket || true
+      "
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports: ["1025:1025", "8025:8025"]
+
+  adminer:
+    image: adminer
+    ports: ["8081:8080"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  backend:
+    build: .
+    env_file: .env
+    environment:
+      NODE_ENV: development
+    ports: ["8080:8080"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+      flyway:
+        condition: service_completed_successfully
+      create-bucket:
+        condition: service_completed_successfully
+
+volumes:
+  mysql_data:
+  minio_data:
