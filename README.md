@@ -31,3 +31,10 @@ Set `FRONTEND_ORIGIN=http://localhost:3000` in `.env` so CORS and cookies (refre
 
 ## Flyway
 SQL migrations live in `backend/flyway/sql`. Compose runs them before the app starts.
+
+## Local Development
+```bash
+npm install
+npm run dev
+```
+The API will be available at `http://localhost:8080/api`.
