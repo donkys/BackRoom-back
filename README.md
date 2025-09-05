@@ -15,6 +15,14 @@ docker compose up -d
 ```
 The compose spins up: MySQL, Flyway (runs migrations), MinIO (+bucket), Mailpit, Adminer, and the backend.
 
+## Local Development (Node.js)
+```bash
+cp .env.example .env
+npm install
+npm run dev
+# API available at http://localhost:8080/api
+```
+
 ## Connect Frontend with ONE path
 Set your frontend environment:
 - `API_BASE_URL=http://localhost:8080` (or your backend URL)
