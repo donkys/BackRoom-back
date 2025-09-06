@@ -4,6 +4,29 @@ Production-ready backend (Node.js + Express + TypeScript) for BacKRoom.
 Implements auth (JWT access + refresh cookie), forgot/reset password, profile,
 S3 presigned upload/download, i18n-from-DB, admin pages, audit logs — as per requirements.
 
+## Local Setup After Clone
+1. Clone the repository and enter the folder:
+   ```bash
+   git clone <repo-url>
+   cd BackRoom-back
+   ```
+2. Copy environment defaults and edit them as needed **before installing dependencies**:
+   ```bash
+   cp .env.example .env
+   ```
+   Key properties to review in `.env`:
+   - `FRONTEND_ORIGIN` – URL of your frontend (defaults to `http://localhost:3000`).
+   - Database settings `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASS`, `DB_NAME` if you aren't using the supplied Docker Compose stack.
+   - S3 (`S3_*`) and SMTP (`SMTP_*`) credentials when pointing to real services.
+
+   Save the file before proceeding.
+3. Install packages and run the backend:
+   ```bash
+   npm install
+   npm run dev
+   ```
+   The API will be available at `http://localhost:8080/api`.
+
 ## Quick Start (Dev, Docker)
 ```bash
 cp .env.example .env
